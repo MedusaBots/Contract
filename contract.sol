@@ -27,8 +27,9 @@ contract Aiverse is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Access
     }
 
     function safeMint(address payable to, string memory tokenURi, address payable abh)
-        public payable
+        public virtual payable
     {
+        require(msg.value >= 10, "Not enough ETH sent; check price!");
         require(totalsupply>0 ,"limit exceeded");
         _tokenIds.increment();
         totalsupply -= 1;
@@ -38,6 +39,12 @@ contract Aiverse is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Access
         _setTokenURI(newItemId , tokenURi);
         uint256 amt = 1e16;
         abh.transfer(amt);
+    }
+    function withdrawal(uint256 amnt)
+    public payable onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        address payable recipient= payable(msg.sender);
+        recipient.transfer(amnt);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)
